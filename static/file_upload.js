@@ -46,6 +46,17 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
     // output file information
     function ParseFile(file) {
         console.log(file)
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            var contents = event.target.result;
+            console.log("File contents: " + contents);
+        };
+
+        reader.onerror = function(event) {
+            console.error("File could not be read! Code " + event.target.error.code);
+        };
+
+        reader.readAsText(file);
 
         Output(
             "<p>File information: <strong>" + file.name +
