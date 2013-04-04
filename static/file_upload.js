@@ -19,8 +19,20 @@ function handleFileSelect(evt) {
             }
 
             console.log(array);
+            add(array);
         };
     })(f);
     reader.readAsText(f);
+
 }
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+  function add(files) {
+    $.ajax({
+      type: "post",
+      data: {"files": files},
+      url: "/create",
+      success: function(data) {
+           }
+    });
+  }
