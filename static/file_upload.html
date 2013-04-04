@@ -23,8 +23,19 @@
         return function(e) {
           // Render thumbnail.
           var span = document.createElement('span');
+
           span.innerHTML = e.target.result.replace("\n", "<br>");
-          console.log(e.target.result);
+
+          var result = e.target.result.replace("\n", "<br>");
+          var rows = e.target.result.split("\r");
+
+          var array = [];
+          for (var i = 0; i < rows.length; i++){
+            var record = rows[i].split(",");
+            array.push(record);
+          }
+
+          console.log(array);
           document.getElementById('list').insertBefore(span, null);
         };
       })(f);
