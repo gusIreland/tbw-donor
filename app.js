@@ -2,21 +2,20 @@
 
 var express = require("express");
 var app = express(); 
-var fs = require("fs");
 var coll;
+
 var mongo = require('mongodb');
 var host = 'localhost';
 var port = mongo.Connection.DEFAULT_PORT;
 
 var optionsWithEnableWriteAccess = { w: 1 };
 var dbName = 'testDb';
-var collections;
+
 var client = new mongo.Db(
     dbName,
     new mongo.Server(host, port),
     optionsWithEnableWriteAccess
 );
-
 
 function openDb(onOpen){
     client.open(onDbReady);
@@ -24,17 +23,17 @@ function openDb(onOpen){
     function onDbReady(error){
         if (error)
             throw error;
-        client.collection('testCollection', onTestCollectionReady);
+        client.collection('donations', onCollectionReady);
     }
 
-    function onTestCollectionReady(error, testCollection){
+    function onCollectionReady(error, collection){
         if (error)
             throw error;
-        
-        testCollection.remove({}, function(error){
+        // remove everything from the collection.
+        collection.remove({}, function(error){
             if (error)
                 throw error;
-            onOpen(testCollection);
+            onOpen(collection);
         });
 
     }
@@ -43,33 +42,21 @@ function openDb(onOpen){
 function closeDb(){
     client.close();
 }
+
 openDb(onDbOpen);
 
-app.use(express.bodyParser());
-app.use(express.static(__dirname + '/static/'));
-
-
-app.post("/create", function(request, response) {
-  var list = request.body.files;
-  createDBEntry(list);
-  response.send({
-    success: true
-  });
-});
-
 function onDbOpen(collection){
-collections = collection;
+    // set coll to be the collection so that we have access to it later
+    coll = collection;
 }
 
-function createDBEntry(list){
-	var objectList = new Array();
-	for(var i = 1; i < list.length; i++){
-		name = list[i][1];
-		tempObject = {'name': name};
-		objectList.push(tempObject);
-	}
-	insertDocuments('testCollection', objectList)
+function onDocumentsInserted(err){
+    if (err)
+        throw err;
+    console.log('documents inserted!');
+    closeDb();
 }
+
 
 function insertDocuments(collection, docs, done){
     if (docs.length === 0){
@@ -77,7 +64,7 @@ function insertDocuments(collection, docs, done){
         return;
     }
     var docHead = docs.shift(); //shift removes first element from docs
-    dbName.testCollection.insert(docHead, function onInserted(err){
+    collection.insert(docHead, function onInserted(err){
         if (err){
             done(err);
             return;
@@ -86,8 +73,30 @@ function insertDocuments(collection, docs, done){
     });
 }
 
+function createDBEntry(list){
+    var objectList = new Array();
+    for(var i = 0; i < list.length; i++){
+        name = list[i][1];
+        tempObject = {'name': name};
+        objectList.push(tempObject);
+    }
+    console.log(objectList);
+
+    insertDocuments(coll, objectList, onDocumentsInserted)
+}
+
+app.use(express.bodyParser());
+
+app.post("/create", function(request, response) {
+    var list = request.body.files;
+    createDBEntry(list);
+    response.send({
+    success: true
+  });
+});
 
 
+app.use(express.static(__dirname + '/static/'));
 app.listen(5555, function(){
 	console.log("Express server listening on port " + 5555);
 });
