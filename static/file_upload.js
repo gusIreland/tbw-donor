@@ -17,7 +17,7 @@ function handleFileSelect(evt) {
                 var record = rows[i].split(",");
                 array.push(record);
             }
-
+            array.shift();
             console.log(array);
             add(array);
         };
