@@ -1,3 +1,5 @@
+var nameList;
+
 function handleFileSelect(evt) {
     var files = evt.target.files; // FileList object
     var f = files[0];
@@ -23,9 +25,28 @@ function handleFileSelect(evt) {
         };
     })(f);
     reader.readAsText(f);
-
 }
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+function populateList(){
+  if(nameList === undefined) return;
+  var container = $("#names");
+  container.html("");
+  for(var i = 0; i < nameList.length; i++){ 
+    var listItem = $("<li>");
+    console.log(nameList[i].name);
+    listItem.html("<p>"+nameList[i].name+"</p>");
+    (
+      function(){
+        var email = nameList[i].email; 
+        listItem.click(function(){
+        alert(email);
+    });
+    })();
+    container.append(listItem);
+  }
+}
+
 
   function add(files) {
     $.ajax({
@@ -33,6 +54,22 @@ document.getElementById('files').addEventListener('change', handleFileSelect, fa
       data: {"files": files},
       url: "/create",
       success: function(data) {
+        getList();
            }
     });
   }
+
+  function getList() {
+    $.ajax({
+      type: "get",
+      url: "/create",
+      success: function(data) {
+        nameList = data.list;
+        populateList();
+           }
+    });
+  }
+
+  
+
+

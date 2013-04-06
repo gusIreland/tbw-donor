@@ -3,11 +3,10 @@
 var express = require("express");
 var app = express(); 
 var coll;
-
 var mongo = require('mongodb');
 var host = 'localhost';
 var port = mongo.Connection.DEFAULT_PORT;
-
+var nameList;
 var optionsWithEnableWriteAccess = { w: 1 };
 var dbName = 'testDb';
 
@@ -54,7 +53,7 @@ function onDocumentsInserted(err){
     if (err)
         throw err;
     console.log('documents inserted!');
-    closeDb();
+//    closeDb();
 }
 
 
@@ -73,11 +72,18 @@ function insertDocuments(collection, docs, done){
     });
 }
 
+
+//Ok, I am bad at closures, I want to find out how to return all without using a global. Because globals are bad
+function findAll(){
+
+}
+
 function createDBEntry(list){
     var objectList = new Array();
     for(var i = 0; i < list.length; i++){
         name = list[i][1];
-        tempObject = {'name': name};
+        email = list[i][15];
+        tempObject = {'name': name, 'email': email};
         objectList.push(tempObject);
     }
     console.log(objectList);
@@ -88,11 +94,24 @@ function createDBEntry(list){
 app.use(express.bodyParser());
 
 app.post("/create", function(request, response) {
+   // openDb(onDbOpen);
     var list = request.body.files;
     createDBEntry(list);
     response.send({
     success: true
   });
+});
+
+app.get("/create", function(request, response) { 
+    coll.find({}).toArray(function(err, doc){
+    if (err)
+        throw error;
+
+    response.send({
+    list: doc,
+    success: true
+  });
+    });
 });
 
 
