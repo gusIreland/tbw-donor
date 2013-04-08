@@ -5,13 +5,24 @@
 <body>
 <input type="file" id="files" name="files[]" multiple />
 <output id="list"></output>
-<ul id="names">
-</ul>
+<table id="table">
+  <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody  id="names">
+
+    </tbody>
+</table>
 
 
-
+<script src="../../media/js/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/media/js/jquery.dataTables.js"></script>
 <script src="file_upload.js"></script>
-<script src="jquery-1.9.1.min.js"></script>
 
 </body>
 </html>

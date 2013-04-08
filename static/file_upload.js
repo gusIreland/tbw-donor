@@ -1,5 +1,11 @@
 var nameList;
 
+$(document).ready(function() {
+  getList();
+    $('#table').dataTable();
+} );
+
+
 function handleFileSelect(evt) {
     var files = evt.target.files; // FileList object
     var f = files[0];
@@ -30,20 +36,29 @@ document.getElementById('files').addEventListener('change', handleFileSelect, fa
 
 function populateList(){
   if(nameList === undefined) return;
+  console.log(nameList);
   var container = $("#names");
   container.html("");
   for(var i = 0; i < nameList.length; i++){ 
-    var listItem = $("<li>");
-    console.log(nameList[i].name);
-    listItem.html("<p>"+nameList[i].name+"</p>");
+    var tableItem = $("<tr>");
+    var name = ("<td>"+nameList[i].name+"</td>");
+    var email = ("<td>"+nameList[i].email+"</td>");
+    var edit= ("<td>Edit</td>");
+    var del = $("<td><a>Delete</a></td>");
     (
       function(){
-        var email = nameList[i].email; 
-        listItem.click(function(){
-        alert(email);
+        var index = i;
+        var id = nameList[i].name;
+        del.click(function(){
+        nameList.splice(index, 1);
+        remove(id);
     });
-    })();
-    container.append(listItem);
+    })(); 
+    tableItem.append(name);
+    tableItem.append(email);
+    tableItem.append(edit);
+    tableItem.append(del);
+    container.append(tableItem);
   }
 }
 
@@ -70,6 +85,14 @@ function populateList(){
     });
   }
 
-  
+  function remove(id) {
+    $.ajax({
+      type: "delete",
+      url: "/create/" + id,
+      success: function(data) {
+        populateList();
+           }
+    });
+  }  
 
 

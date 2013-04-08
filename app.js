@@ -28,12 +28,13 @@ function openDb(onOpen){
     function onCollectionReady(error, collection){
         if (error)
             throw error;
+        onOpen(collection);
         // remove everything from the collection.
-        collection.remove({}, function(error){
+        /*collection.remove({}, function(error){
             if (error)
                 throw error;
             onOpen(collection);
-        });
+        });*/
 
     }
 }
@@ -74,16 +75,13 @@ function insertDocuments(collection, docs, done){
 
 
 //Ok, I am bad at closures, I want to find out how to return all without using a global. Because globals are bad
-function findAll(){
-
-}
 
 function createDBEntry(list){
     var objectList = new Array();
     for(var i = 0; i < list.length; i++){
         name = list[i][1];
         email = list[i][15];
-        tempObject = {'name': name, 'email': email};
+        tempObject = {'name': name, 'email': email, unique: true};
         objectList.push(tempObject);
     }
     console.log(objectList);
@@ -103,15 +101,31 @@ app.post("/create", function(request, response) {
 });
 
 app.get("/create", function(request, response) { 
+    
     coll.find({}).toArray(function(err, doc){
     if (err)
         throw error;
-
+    //console.log(doc);
     response.send({
     list: doc,
     success: true
   });
     });
+});
+
+app.delete("/create/:id", function(request, response){
+//var objID = ObjectId.createFromHexString(request.params.id);
+var query = { name:  request.params.id};
+console.log(query);
+coll.remove(query, function logResult(error, numberDocsRemoved){
+    if (error)
+        throw error;
+    console.log(numberDocsRemoved)
+});
+
+  response.send({
+    success: true
+  });
 });
 
 
